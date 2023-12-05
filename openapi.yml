@@ -11,10 +11,10 @@ paths:
       description: Checks whether the database web server is running.
       responses:
         '200':
-          description: Success
+          description: 'Success'
           content: {}
         '500':
-          description: Failure
+          description: 'Failure'
           content: {}
 
   /health:
@@ -23,10 +23,10 @@ paths:
       description: Checks the status of the database server and storage engine.
       responses:
         '200':
-          description: Success
+          description: 'Success'
           content: {}
         '500':
-          description: Failure
+          description: 'Failure'
           content: {}
 
   /export:
@@ -48,7 +48,7 @@ paths:
         description: Sets the selected Database for queries
       responses:
         '200':
-          description: /export
+          description: 'Export successful'
           content:
             text/plain:
               examples:
@@ -143,7 +143,7 @@ paths:
 
       responses:
         '200':
-          description: ''
+          description: 'Import successful'
 
   /key/{table}:
 
@@ -177,49 +177,7 @@ paths:
         description: The table of the records to select
       responses:
         '200':
-          description: ''
-
-    put:
-      summary: /key/:table
-      description: |-
-        This HTTP RESTful endpoint updates all records in a specific table in the database. It replaces the record content with the supplied request data, and is equivalent to running:
-
-        ``` sql
-        UPDATE type::table($table) CONTENT $body;
-        ```
-      parameters:
-      - name: NS
-        in: header
-        schema:
-          type: string
-          example: '{{namespace}}'
-        description: Sets the selected Namespace for queries
-      - name: DB
-        in: header
-        schema:
-          type: string
-          example: '{{database}}'
-        description: Sets the selected Database for queries
-      - name: table
-        in: path
-        required: true
-        schema:
-          type: string
-          example: person
-        description: The table of the records to update
-      requestBody:
-        content:
-          text/plain:
-            examples:
-              /key/:table:
-                value: |-
-                  {
-                      account: account:test,
-                      tester: true,
-                  }
-      responses:
-        '200':
-          description: ''
+          description: 'Records selected successfully'
 
     post:
       summary: /key/:table
@@ -261,7 +219,49 @@ paths:
                   }
       responses:
         '200':
-          description: ''
+          description: 'Record created successfully'
+
+    put:
+      summary: /key/:table
+      description: |-
+        This HTTP RESTful endpoint updates all records in a specific table in the database. It replaces the record content with the supplied request data, and is equivalent to running:
+
+        ``` sql
+        UPDATE type::table($table) CONTENT $body;
+        ```
+      parameters:
+      - name: NS
+        in: header
+        schema:
+          type: string
+          example: '{{namespace}}'
+        description: Sets the selected Namespace for queries
+      - name: DB
+        in: header
+        schema:
+          type: string
+          example: '{{database}}'
+        description: Sets the selected Database for queries
+      - name: table
+        in: path
+        required: true
+        schema:
+          type: string
+          example: person
+        description: The table of the records to update
+      requestBody:
+        content:
+          text/plain:
+            examples:
+              /key/:table:
+                value: |-
+                  {
+                      account: account:test,
+                      tester: true,
+                  }
+      responses:
+        '200':
+          description: 'Records updated successfully'
 
     patch:
       summary: /key/:table
@@ -303,7 +303,7 @@ paths:
                   }
       responses:
         '200':
-          description: ''
+          description: 'Records updated successfully'
 
     delete:
       summary: /key/:table
@@ -335,7 +335,7 @@ paths:
         description: The table of the records to delete
       responses:
         '200':
-          description: ''
+          description: 'Records deleted successfully'
 
   /key/{table}/{id}:
 
@@ -376,7 +376,7 @@ paths:
         description: The id of the record to select
       responses:
         '200':
-          description: /key/:table/:id
+          description: 'Record selected successfully'
           headers:
             date:
               schema:
@@ -386,10 +386,6 @@ paths:
               schema:
                 type: string
                 example: SurrealDB
-            version:
-              schema:
-                type: string
-                example: surreal-1.0.0-beta.8
           content:
             application/json:
               schema:
@@ -431,6 +427,55 @@ paths:
                       some: true
                     status: OK
                     time: 817.291µs
+
+    post:
+      summary: /key/:table/:id
+      description: |-
+        This HTTP RESTful endpoint creates a specific record in a table in the database. The supplied request body is used as the content of the record, and is equivalent to running:
+
+        ``` sql
+        CREATE type::thing($table, $id) CONTENT $body;
+        ```
+      parameters:
+      - name: NS
+        in: header
+        schema:
+          type: string
+          example: '{{namespace}}'
+        description: Sets the selected Namespace for queries
+      - name: DB
+        in: header
+        schema:
+          type: string
+          example: '{{database}}'
+        description: Sets the selected Database for queries
+      - name: table
+        in: path
+        required: true
+        schema:
+          type: string
+          example: person
+        description: The table of the record to create
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: test
+        description: The id of the record to create
+      requestBody:
+        content:
+          text/plain:
+            examples:
+              /key/:table/:id:
+                value: |-
+                  {
+                      account: account:test,
+                      tester: true,
+                  }
+      responses:
+        '200':
+          description: 'Record created successfully'
 
     put:
       summary: /key/:table/:id
@@ -484,56 +529,7 @@ paths:
                   }
       responses:
         '200':
-          description: ''
-
-    post:
-      summary: /key/:table/:id
-      description: |-
-        This HTTP RESTful endpoint creates a specific record in a table in the database. The supplied request body is used as the content of the record, and is equivalent to running:
-
-        ``` sql
-        CREATE type::thing($table, $id) CONTENT $body;
-        ```
-      parameters:
-      - name: NS
-        in: header
-        schema:
-          type: string
-          example: '{{namespace}}'
-        description: Sets the selected Namespace for queries
-      - name: DB
-        in: header
-        schema:
-          type: string
-          example: '{{database}}'
-        description: Sets the selected Database for queries
-      - name: table
-        in: path
-        required: true
-        schema:
-          type: string
-          example: person
-        description: The table of the record to create
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          example: test
-        description: The id of the record to create
-      requestBody:
-        content:
-          text/plain:
-            examples:
-              /key/:table/:id:
-                value: |-
-                  {
-                      account: account:test,
-                      tester: true,
-                  }
-      responses:
-        '200':
-          description: ''
+          description: 'Record updated successfully'
 
     patch:
       summary: /key/:table/:id
@@ -583,7 +579,7 @@ paths:
                   }
       responses:
         '200':
-          description: ''
+          description: 'Record updated successfully'
 
     delete:
       summary: /key/:table/:id
@@ -623,7 +619,7 @@ paths:
         description: The id of the record to delete
       responses:
         '200':
-          description: ''
+          description: 'Record deleted successfully'
 
   /sql:
 
@@ -657,7 +653,7 @@ paths:
                   COMMIT TRANSACTION;
       responses:
         '200':
-          description: ''
+          description: 'Request completed successfully'
 
   /version:
     get:
@@ -665,4 +661,4 @@ paths:
       description: Returns the version of the SurrealDB database server.
       responses:
         '200':
-          description: ''
+          description: 'Success'
