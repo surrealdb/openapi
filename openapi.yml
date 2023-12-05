@@ -595,7 +595,6 @@ paths:
 
         ``` sql
         UPDATE type::thing($table, $id) MERGE $body;
-
         ```
       parameters:
       - name: NS
@@ -647,7 +646,6 @@ paths:
 
         ``` sql
         DELETE type::thing($table, $id);
-
         ```
       parameters:
       - name: NS
