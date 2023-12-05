@@ -3,12 +3,48 @@ info:
   title: SurrealDB HTTP API
   description: The HTTP endpoints enable simple selection and modifications of all records or a single record in a table, in addition to support for custom SurrealQL queries with multiple statements, using traditional RESTful HTTP url endpoints.
   version: 1.0.0
+externalDocs:
+  description: Find out more about SurrealDB
+  url: https://docs.surrealdb.com
+tags:
+  - name: status
+    description: Fetch status information for a SurrealDB server
+    externalDocs:
+      description: More information
+      url: https://docs.surrealdb.com/docs/integration/http
+  - name: import
+    description: Import SurrealQL data into a SurrealDB server
+    externalDocs:
+      description: More information
+      url: https://docs.surrealdb.com/docs/cli/import
+  - name: export
+    description: Export SurrealQL data from a SurrealDB server
+    externalDocs:
+      description: More information
+      url: https://docs.surrealdb.com/docs/cli/export
+  - name: table
+    description: Select, create, update, and delete records in a table
+    externalDocs:
+      description: More information
+      url: https://docs.surrealdb.com/docs/integration/http
+  - name: record
+    description: Select, create, update, and delete a specific record
+    externalDocs:
+      description: More information
+      url: https://docs.surrealdb.com/docs/integration/http
+  - name: sql
+    description: Run advanced SurrealQL queries
+    externalDocs:
+      description: More information
+      url: https://docs.surrealdb.com/docs/surrealql/overview
 paths:
 
   /status:
     get:
-      summary: /status
-      description: Checks whether the database web server is running.
+      tags:
+        - status
+      summary: Fetch the status of a SurrealDB server
+      description: Checks the connection status of a local or remote SurrealDB server.
       responses:
         '200':
           description: 'Success'
@@ -17,18 +53,32 @@ paths:
 
   /health:
     get:
-      summary: /health
-      description: Checks the status of the database server and storage engine.
+      tags:
+        - status
+      summary: Fetch the health of a SurrealDB server
+      description: Checks the health status of a local or remote SurrealDB server and storage engine.
       responses:
         '200':
           description: 'Success'
         '500':
           description: 'Failure'
 
+  /version:
+    get:
+      tags:
+        - status
+      summary: Fetch the version of a SurrealDB server
+      description: Returns the version of a local or remote SurrealDB database server.
+      responses:
+        '200':
+          description: 'Success'
+
   /export:
     get:
-      summary: /export
-      description: Checks the status of the database server and storage engine.
+      tags:
+        - export
+      summary: Export SurrealQL data from SurrealDB
+      description: Exports SurrealQL data from a local or remote SurrealDB server.
       parameters:
       - name: NS
         in: header
@@ -85,8 +135,10 @@ paths:
 
   /import:
     post:
-      summary: /import
-      description: Checks the status of the database server and storage engine.
+      tags:
+        - import
+      summary: Import SurrealQL data into SurrealDB
+      description: Imports SurrealQL data into a local or remote SurrealDB server.
       parameters:
       - name: NS
         in: header
@@ -144,7 +196,9 @@ paths:
   /key/{table}:
 
     get:
-      summary: /key/:table
+      tags:
+        - table
+      summary: 'Select all records from a table'
       description: |-
         This HTTP RESTful endpoint selects all records from a specific table in the database. It is equivalent to running:
 
@@ -176,7 +230,9 @@ paths:
           description: 'Records selected successfully'
 
     post:
-      summary: /key/:table
+      tags:
+        - table
+      summary: 'Create a new record in a table'
       description: |-
         This HTTP RESTful endpoint creates a record in a specific table in the database. The supplied request body is used as the content of the record, and is equivalent to running:
 
@@ -218,7 +274,9 @@ paths:
           description: 'Record created successfully'
 
     put:
-      summary: /key/:table
+      tags:
+        - table
+      summary: 'Update all records in a table'
       description: |-
         This HTTP RESTful endpoint updates all records in a specific table in the database. It replaces the record content with the supplied request data, and is equivalent to running:
 
@@ -260,7 +318,9 @@ paths:
           description: 'Records updated successfully'
 
     patch:
-      summary: /key/:table
+      tags:
+        - table
+      summary: 'Update all records in a table'
       description: |-
         This HTTP RESTful endpoint updates all records in a specific table in the database. It merges the supplied request data with the records in the table, and is equivalent to running:
 
@@ -302,7 +362,9 @@ paths:
           description: 'Records updated successfully'
 
     delete:
-      summary: /key/:table
+      tags:
+        - table
+      summary: 'Delete all records from a table'
       description: |-
         This HTTP RESTful endpoint deletes all records from a specific table in the database. It is equivalent to running:
 
@@ -336,7 +398,9 @@ paths:
   /key/{table}/{id}:
 
     get:
-      summary: /key/:table/:id
+      tags:
+        - record
+      summary: 'Select a specific record from a table'
       description: |-
         This HTTP RESTful endpoint selects a specific record from a table in the database. It is equivalent to running:
 
@@ -416,7 +480,9 @@ paths:
                     time: 817.291µs
 
     post:
-      summary: /key/:table/:id
+      tags:
+        - record
+      summary: 'Create a specific record in a table'
       description: |-
         This HTTP RESTful endpoint creates a specific record in a table in the database. The supplied request body is used as the content of the record, and is equivalent to running:
 
@@ -465,7 +531,9 @@ paths:
           description: 'Record created successfully'
 
     put:
-      summary: /key/:table/:id
+      tags:
+        - record
+      summary: 'Update a specific record in a table'
       description: |-
         This HTTP RESTful endpoint updates a specific record in a table in the database. The supplied request body is used as the content of the record, and is equivalent to running:
 
@@ -519,7 +587,9 @@ paths:
           description: 'Record updated successfully'
 
     patch:
-      summary: /key/:table/:id
+      tags:
+        - record
+      summary: 'Update a specific record in a table'
       description: |-
         This HTTP RESTful endpoint updates a specific record in a table in the database. It merges the supplied request data with the records in the table, and is equivalent to running:
 
@@ -569,7 +639,9 @@ paths:
           description: 'Record updated successfully'
 
     delete:
-      summary: /key/:table/:id
+      tags:
+        - record
+      summary: 'Delete a specific record from a table'
       description: |-
         This HTTP RESTful endpoint deletes a specific record from a table in the database. It is equivalent to running:
 
@@ -611,7 +683,9 @@ paths:
   /sql:
 
     post:
-      summary: /sql
+      tags:
+        - sql
+      summary: Run SurrealQL queries against SurrealDB
       description: The SQL endpoint enables running advanced SurrealQL queries. This HTTP endpoint expects the HTTP body to be one or more SurrealQL statements, separated by a semicolon.
       parameters:
       - name: NS
@@ -641,11 +715,3 @@ paths:
       responses:
         '200':
           description: 'Request completed successfully'
-
-  /version:
-    get:
-      summary: /version
-      description: Returns the version of the SurrealDB database server.
-      responses:
-        '200':
-          description: 'Success'
