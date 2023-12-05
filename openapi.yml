@@ -377,15 +377,6 @@ paths:
       responses:
         '200':
           description: 'Record selected successfully'
-          headers:
-            date:
-              schema:
-                type: string
-                example: Wed, 20 Jul 2022 09:55:44 GMT
-            server:
-              schema:
-                type: string
-                example: SurrealDB
           content:
             application/json:
               schema:
