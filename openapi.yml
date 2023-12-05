@@ -5,11 +5,22 @@ info:
   version: 1.0.0
 paths:
 
+  /status:
+    get:
+      summary: /status
+      description: Checks whether the database web server is running.
+      responses:
+        '200':
+          description: Success
+          content: {}
+        '500':
+          description: Failure
+          content: {}
+
   /health:
     get:
       summary: /health
       description: Checks the status of the database server and storage engine.
-      operationId: health
       responses:
         '200':
           description: Success
@@ -22,7 +33,6 @@ paths:
     get:
       summary: /export
       description: Checks the status of the database server and storage engine.
-      operationId: export
       parameters:
       - name: NS
         in: header
@@ -81,7 +91,6 @@ paths:
     post:
       summary: /import
       description: Checks the status of the database server and storage engine.
-      operationId: import
       parameters:
       - name: NS
         in: header
@@ -146,7 +155,6 @@ paths:
         ``` sql
         SELECT * FROM type::table($table);
         ```
-      operationId: keyTable
       parameters:
       - name: NS
         in: header
@@ -160,6 +168,13 @@ paths:
           type: string
           example: '{{database}}'
         description: Sets the selected Database for queries
+      - name: table
+        in: path
+        required: true
+        schema:
+          type: string
+          example: person
+        description: The table of the records to select
       responses:
         '200':
           description: ''
@@ -172,7 +187,6 @@ paths:
         ``` sql
         UPDATE type::table($table) CONTENT $body;
         ```
-      operationId: keyTable2
       parameters:
       - name: NS
         in: header
@@ -186,6 +200,13 @@ paths:
           type: string
           example: '{{database}}'
         description: Sets the selected Database for queries
+      - name: table
+        in: path
+        required: true
+        schema:
+          type: string
+          example: person
+        description: The table of the records to update
       requestBody:
         content:
           text/plain:
@@ -208,7 +229,6 @@ paths:
         ``` sql
         CREATE type::table($table) CONTENT $body;
         ```
-      operationId: keyTable1
       parameters:
       - name: NS
         in: header
@@ -222,6 +242,13 @@ paths:
           type: string
           example: '{{database}}'
         description: Sets the selected Database for queries
+      - name: table
+        in: path
+        required: true
+        schema:
+          type: string
+          example: person
+        description: The table of the record to create
       requestBody:
         content:
           text/plain:
@@ -244,7 +271,6 @@ paths:
         ``` sql
         UPDATE type::table($table) MERGE $body;
         ```
-      operationId: keyTable3
       parameters:
       - name: NS
         in: header
@@ -258,6 +284,13 @@ paths:
           type: string
           example: '{{database}}'
         description: Sets the selected Database for queries
+      - name: table
+        in: path
+        required: true
+        schema:
+          type: string
+          example: person
+        description: The table of the records to update
       requestBody:
         content:
           text/plain:
@@ -271,14 +304,6 @@ paths:
       responses:
         '200':
           description: ''
-    parameters:
-    - name: table
-      in: path
-      required: true
-      schema:
-        type: string
-        example: person
-      description: The table where the record should be created
 
     delete:
       summary: /key/:table
@@ -288,7 +313,6 @@ paths:
         ``` sql
         DELETE type::table($table);
         ```
-      operationId: keyTable4
       parameters:
       - name: NS
         in: header
@@ -302,6 +326,13 @@ paths:
           type: string
           example: '{{database}}'
         description: Sets the selected Database for queries
+      - name: table
+        in: path
+        required: true
+        schema:
+          type: string
+          example: person
+        description: The table of the records to delete
       responses:
         '200':
           description: ''
@@ -316,7 +347,6 @@ paths:
         ``` sql
         SELECT * FROM type::thing($table, $id);
         ```
-      operationId: keyTableId
       parameters:
       - name: NS
         in: header
@@ -330,6 +360,20 @@ paths:
           type: string
           example: '{{database}}'
         description: Sets the selected Database for queries
+      - name: table
+        in: path
+        required: true
+        schema:
+          type: string
+          example: person
+        description: The table of the record to select
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: test
+        description: The id of the record to select
       responses:
         '200':
           description: /key/:table/:id
@@ -396,7 +440,6 @@ paths:
         ``` sql
         UPDATE type::thing($table, $id) CONTENT $body;
         ```
-      operationId: keyTableId2
       parameters:
       - name: tags
         in: query
@@ -415,6 +458,20 @@ paths:
           type: string
           example: '{{database}}'
         description: Sets the selected Database for queries
+      - name: table
+        in: path
+        required: true
+        schema:
+          type: string
+          example: person
+        description: The table of the record to update
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: test
+        description: The id of the record to update
       requestBody:
         content:
           text/plain:
@@ -437,7 +494,6 @@ paths:
         ``` sql
         CREATE type::thing($table, $id) CONTENT $body;
         ```
-      operationId: keyTableId1
       parameters:
       - name: NS
         in: header
@@ -451,6 +507,20 @@ paths:
           type: string
           example: '{{database}}'
         description: Sets the selected Database for queries
+      - name: table
+        in: path
+        required: true
+        schema:
+          type: string
+          example: person
+        description: The table of the record to create
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: test
+        description: The id of the record to create
       requestBody:
         content:
           text/plain:
@@ -474,7 +544,6 @@ paths:
         UPDATE type::thing($table, $id) MERGE $body;
 
         ```
-      operationId: keyTableId3
       parameters:
       - name: NS
         in: header
@@ -488,6 +557,20 @@ paths:
           type: string
           example: '{{database}}'
         description: Sets the selected Database for queries
+      - name: table
+        in: path
+        required: true
+        schema:
+          type: string
+          example: person
+        description: The table of the record to update
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: test
+        description: The id of the record to update
       requestBody:
         content:
           text/plain:
@@ -501,21 +584,6 @@ paths:
       responses:
         '200':
           description: ''
-    parameters:
-    - name: table
-      in: path
-      required: true
-      schema:
-        type: string
-        example: person
-      description: The table where the record should be created
-    - name: id
-      in: path
-      required: true
-      schema:
-        type: string
-        example: test
-      description: The id of the record to create
 
     delete:
       summary: /key/:table/:id
@@ -526,7 +594,6 @@ paths:
         DELETE type::thing($table, $id);
 
         ```
-      operationId: keyTableId4
       parameters:
       - name: NS
         in: header
@@ -540,6 +607,20 @@ paths:
           type: string
           example: '{{database}}'
         description: Sets the selected Database for queries
+      - name: table
+        in: path
+        required: true
+        schema:
+          type: string
+          example: person
+        description: The table of the record to delete
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: test
+        description: The id of the record to delete
       responses:
         '200':
           description: ''
@@ -549,7 +630,6 @@ paths:
     post:
       summary: /sql
       description: The SQL endpoint enables running advanced SurrealQL queries. This HTTP endpoint expects the HTTP body to be one or more SurrealQL statements, separated by a semicolon.
-      operationId: sql
       parameters:
       - name: NS
         in: header
@@ -579,33 +659,10 @@ paths:
         '200':
           description: ''
 
-  /status:
-    get:
-      summary: /status
-      description: Checks whether the database web server is running.
-      operationId: status
-      responses:
-        '200':
-          description: Success
-          content: {}
-        '500':
-          description: Failure
-          content: {}
-
   /version:
     get:
       summary: /version
       description: Returns the version of the SurrealDB database server.
-      operationId: version
-      responses:
-        '200':
-          description: ''
-
-  /signin:
-    get:
-      summary: /signin
-      description: /signin
-      operationId: signin
       responses:
         '200':
           description: ''
