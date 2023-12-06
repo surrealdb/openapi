@@ -1,129 +1,736 @@
-openapi: 3.0.0
+openapi: 3.0.3
 info:
   title: SurrealDB HTTP API
+  description: The HTTP endpoints enable simple selection and modifications of all records or a single record in a table, in addition to support for custom SurrealQL queries with multiple statements, using traditional RESTful HTTP url endpoints.
   version: 1.0.0
+externalDocs:
+  description: Find out more about SurrealDB
+  url: https://docs.surrealdb.com
+tags:
+  - name: status
+    description: Fetch status information for a SurrealDB server
+    externalDocs:
+      description: More information
+      url: https://docs.surrealdb.com/docs/integration/http
+  - name: import
+    description: Import SurrealQL data into a SurrealDB server
+    externalDocs:
+      description: More information
+      url: https://docs.surrealdb.com/docs/cli/import
+  - name: export
+    description: Export SurrealQL data from a SurrealDB server
+    externalDocs:
+      description: More information
+      url: https://docs.surrealdb.com/docs/cli/export
+  - name: table
+    description: Select, create, update, and delete records in a table
+    externalDocs:
+      description: More information
+      url: https://docs.surrealdb.com/docs/integration/http
+  - name: record
+    description: Select, create, update, and delete a specific record
+    externalDocs:
+      description: More information
+      url: https://docs.surrealdb.com/docs/integration/http
+  - name: sql
+    description: Run advanced SurrealQL queries
+    externalDocs:
+      description: More information
+      url: https://docs.surrealdb.com/docs/surrealql/overview
 paths:
-  /export:
+
+  /status:
     get:
-      summary: Exports all data for a specific Namespace and Database
+      tags:
+        - status
+      summary: Fetch the status of a SurrealDB server
+      description: Checks the connection status of a local or remote SurrealDB server.
       responses:
         '200':
-          description: Successful response
+          description: 'Success'
+        '500':
+          description: 'Failure'
 
   /health:
     get:
-      summary: Checks the status of the database server and storage engine
+      tags:
+        - status
+      summary: Fetch the health of a SurrealDB server
+      description: Checks the health status of a local or remote SurrealDB server and storage engine.
       responses:
         '200':
-          description: Success
+          description: 'Success'
         '500':
-          description: Server error
-
-  /import:
-    get:
-      summary: Imports data into a specific Namespace and Database
-      responses:
-        '200':
-          description: Successful import
-
-  /key/{table}:
-    get:
-      summary: Selects all records in a table from the database
-      parameters:
-        - in: path
-          name: table
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successful response
-
-    post:
-      summary: Creates a record in a table in the database
-      responses:
-        '200':
-          description: Record created
-
-    delete:
-      summary: Deletes all records in a table from the database
-      responses:
-        '200':
-          description: Records deleted
-
-  /key/{table}/{id}:
-    get:
-      summary: Selects a specific record from the database
-      parameters:
-        - in: path
-          name: table
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successful response
-
-    post:
-      summary: Creates a specific record in the database
-      responses:
-        '200':
-          description: Record created
-
-    put:
-      summary: Updates the specified record in the database
-      responses:
-        '200':
-          description: Record updated
-
-    patch:
-      summary: Modifies the specified record in the database
-      responses:
-        '200':
-          description: Record modified
-
-    delete:
-      summary: Deletes the specified record from the database
-      responses:
-        '200':
-          description: Record deleted
-
-  /signup:
-    post:
-      summary: Signs-up as a scope user to a specific scope
-      responses:
-        '200':
-          description: Signup successful
-
-  /signin:
-    post:
-      summary: Signs-in as a root, namespace, database, or scope user
-      responses:
-        '200':
-          description: Signin successful
-
-  /sql:
-    post:
-      summary: Allows custom SurrealQL queries
-      responses:
-        '200':
-          description: Query successful
-
-  /status:
-    post:
-      summary: Checks the status of the database web server
-      responses:
-        '200':
-          description: Status OK
+          description: 'Failure'
 
   /version:
-    post:
-      summary: Returns the version of the SurrealDB database server
+    get:
+      tags:
+        - status
+      summary: Fetch the version of a SurrealDB server
+      description: Returns the version of a local or remote SurrealDB database server.
       responses:
         '200':
-          description: Version information retrieved
+          description: 'Success'
+
+  /export:
+    get:
+      tags:
+        - export
+      summary: Export SurrealQL data from SurrealDB
+      description: Exports SurrealQL data from a local or remote SurrealDB server.
+      parameters:
+      - name: NS
+        in: header
+        schema:
+          type: string
+          example: '{{namespace}}'
+        description: Sets the selected Namespace for queries
+      - name: DB
+        in: header
+        schema:
+          type: string
+          example: '{{database}}'
+        description: Sets the selected Database for queries
+      responses:
+        '200':
+          description: 'Export successful'
+          content:
+            text/plain:
+              examples:
+                /export:
+                  value: |+
+                    -- ------------------------------
+                    -- OPTION
+                    -- ------------------------------
+
+                    OPTION IMPORT;
+
+                    -- ------------------------------
+                    -- TABLE: person
+                    -- ------------------------------
+
+                    DEFINE TABLE person SCHEMALESS PERMISSIONS NONE;
+
+                    -- ------------------------------
+                    -- TRANSACTION
+                    -- ------------------------------
+
+                    BEGIN TRANSACTION;
+
+                    -- ------------------------------
+                    -- TABLE DATA: person
+                    -- ------------------------------
+
+                    UPDATE person:one CONTENT { id: person:one, name: 'Joe Bloggs' };
+                    UPDATE person:test CONTENT { account: account:test, id: person:test, tester: true };
+                    UPDATE person:two CONTENT { id: person:two, name: 'Elizabeth Hurdle' };
+
+                    -- ------------------------------
+                    -- TRANSACTION
+                    -- ------------------------------
+
+                    COMMIT TRANSACTION;
+
+
+  /import:
+    post:
+      tags:
+        - import
+      summary: Import SurrealQL data into SurrealDB
+      description: Imports SurrealQL data into a local or remote SurrealDB server.
+      parameters:
+      - name: NS
+        in: header
+        schema:
+          type: string
+          example: '{{namespace}}'
+        description: Sets the selected Namespace for queries
+      - name: DB
+        in: header
+        schema:
+          type: string
+          example: '{{database}}'
+        description: Sets the selected Database for queries
+      requestBody:
+        content:
+          text/plain:
+            examples:
+              /import:
+                value: |+
+                  -- ------------------------------
+                  -- OPTION
+                  -- ------------------------------
+
+                  OPTION IMPORT;
+
+                  -- ------------------------------
+                  -- TABLE: person
+                  -- ------------------------------
+
+                  DEFINE TABLE person SCHEMALESS PERMISSIONS NONE;
+
+                  -- ------------------------------
+                  -- TRANSACTION
+                  -- ------------------------------
+
+                  BEGIN TRANSACTION;
+
+                  -- ------------------------------
+                  -- TABLE DATA: person
+                  -- ------------------------------
+
+                  UPDATE person:one CONTENT { id: person:one, name: 'Joe Bloggs' };
+                  UPDATE person:two CONTENT { id: person:two, name: 'Elizabeth Hurdle' };
+
+                  -- ------------------------------
+                  -- TRANSACTION
+                  -- ------------------------------
+
+                  COMMIT TRANSACTION;
+
+      responses:
+        '200':
+          description: 'Import successful'
+
+  /key/{table}:
+
+    get:
+      tags:
+        - table
+      summary: 'Select all records from a table'
+      description: |-
+        This HTTP RESTful endpoint selects all records from a specific table in the database. It is equivalent to running:
+
+        ``` sql
+        SELECT * FROM type::table($table);
+        ```
+      parameters:
+      - name: NS
+        in: header
+        schema:
+          type: string
+          example: '{{namespace}}'
+        description: Sets the selected Namespace for queries
+      - name: DB
+        in: header
+        schema:
+          type: string
+          example: '{{database}}'
+        description: Sets the selected Database for queries
+      - name: table
+        in: path
+        required: true
+        schema:
+          type: string
+          example: person
+        description: The table of the records to select
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          example: 100
+        description: The number of record results to fetch
+      - name: start
+        in: query
+        required: false
+        schema:
+          type: integer
+          example: 0
+        description: The number of record results to skip
+      - name: fields
+        in: query
+        required: false
+        schema:
+          type: string
+          example: account,age,name.first,name.last
+        description: A comma-separated list of specific fields to retrieve for each record
+      responses:
+        '200':
+          description: 'Records selected successfully'
+
+    post:
+      tags:
+        - table
+      summary: 'Create a new record in a table'
+      description: |-
+        This HTTP RESTful endpoint creates a record in a specific table in the database. The supplied request body is used as the content of the record, and is equivalent to running:
+
+        ``` sql
+        CREATE type::table($table) CONTENT $body;
+        ```
+      parameters:
+      - name: NS
+        in: header
+        schema:
+          type: string
+          example: '{{namespace}}'
+        description: Sets the selected Namespace for queries
+      - name: DB
+        in: header
+        schema:
+          type: string
+          example: '{{database}}'
+        description: Sets the selected Database for queries
+      - name: table
+        in: path
+        required: true
+        schema:
+          type: string
+          example: person
+        description: The table of the record to create
+      requestBody:
+        content:
+          text/plain:
+            examples:
+              /key/:table:
+                value: |-
+                  {
+                      account: account:test,
+                      tester: true,
+                  }
+      responses:
+        '200':
+          description: 'Record created successfully'
+
+    put:
+      tags:
+        - table
+      summary: 'Update all records in a table'
+      description: |-
+        This HTTP RESTful endpoint updates all records in a specific table in the database. It replaces the record content with the supplied request data, and is equivalent to running:
+
+        ``` sql
+        UPDATE type::table($table) CONTENT $body;
+        ```
+      parameters:
+      - name: NS
+        in: header
+        schema:
+          type: string
+          example: '{{namespace}}'
+        description: Sets the selected Namespace for queries
+      - name: DB
+        in: header
+        schema:
+          type: string
+          example: '{{database}}'
+        description: Sets the selected Database for queries
+      - name: table
+        in: path
+        required: true
+        schema:
+          type: string
+          example: person
+        description: The table of the records to update
+      requestBody:
+        content:
+          text/plain:
+            examples:
+              /key/:table:
+                value: |-
+                  {
+                      account: account:test,
+                      tester: true,
+                  }
+      responses:
+        '200':
+          description: 'Records updated successfully'
+
+    patch:
+      tags:
+        - table
+      summary: 'Update all records in a table'
+      description: |-
+        This HTTP RESTful endpoint updates all records in a specific table in the database. It merges the supplied request data with the records in the table, and is equivalent to running:
+
+        ``` sql
+        UPDATE type::table($table) MERGE $body;
+        ```
+      parameters:
+      - name: NS
+        in: header
+        schema:
+          type: string
+          example: '{{namespace}}'
+        description: Sets the selected Namespace for queries
+      - name: DB
+        in: header
+        schema:
+          type: string
+          example: '{{database}}'
+        description: Sets the selected Database for queries
+      - name: table
+        in: path
+        required: true
+        schema:
+          type: string
+          example: person
+        description: The table of the records to update
+      requestBody:
+        content:
+          text/plain:
+            examples:
+              /key/:table:
+                value: |-
+                  {
+                      account: account:test,
+                      tester: true,
+                  }
+      responses:
+        '200':
+          description: 'Records updated successfully'
+
+    delete:
+      tags:
+        - table
+      summary: 'Delete all records from a table'
+      description: |-
+        This HTTP RESTful endpoint deletes all records from a specific table in the database. It is equivalent to running:
+
+        ``` sql
+        DELETE type::table($table);
+        ```
+      parameters:
+      - name: NS
+        in: header
+        schema:
+          type: string
+          example: '{{namespace}}'
+        description: Sets the selected Namespace for queries
+      - name: DB
+        in: header
+        schema:
+          type: string
+          example: '{{database}}'
+        description: Sets the selected Database for queries
+      - name: table
+        in: path
+        required: true
+        schema:
+          type: string
+          example: person
+        description: The table of the records to delete
+      responses:
+        '200':
+          description: 'Records deleted successfully'
+
+  /key/{table}/{id}:
+
+    get:
+      tags:
+        - record
+      summary: 'Select a specific record from a table'
+      description: |-
+        This HTTP RESTful endpoint selects a specific record from a table in the database. It is equivalent to running:
+
+        ``` sql
+        SELECT * FROM type::thing($table, $id);
+        ```
+      parameters:
+      - name: NS
+        in: header
+        schema:
+          type: string
+          example: '{{namespace}}'
+        description: Sets the selected Namespace for queries
+      - name: DB
+        in: header
+        schema:
+          type: string
+          example: '{{database}}'
+        description: Sets the selected Database for queries
+      - name: table
+        in: path
+        required: true
+        schema:
+          type: string
+          example: person
+        description: The table of the record to select
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: test
+        description: The id of the record to select
+      responses:
+        '200':
+          description: 'Record selected successfully'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    result:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: person:test
+                          some:
+                            type: boolean
+                            example: true
+                      example:
+                      - id: person:test
+                        some: true
+                    status:
+                      type: string
+                      example: OK
+                    time:
+                      type: string
+                      example: 817.291µs
+                example:
+                - result:
+                  - id: person:test
+                    some: true
+                  status: OK
+                  time: 817.291µs
+              examples:
+                /key/:table/:id:
+                  value:
+                  - result:
+                    - id: person:test
+                      some: true
+                    status: OK
+                    time: 817.291µs
+
+    post:
+      tags:
+        - record
+      summary: 'Create a specific record in a table'
+      description: |-
+        This HTTP RESTful endpoint creates a specific record in a table in the database. The supplied request body is used as the content of the record, and is equivalent to running:
+
+        ``` sql
+        CREATE type::thing($table, $id) CONTENT $body;
+        ```
+      parameters:
+      - name: NS
+        in: header
+        schema:
+          type: string
+          example: '{{namespace}}'
+        description: Sets the selected Namespace for queries
+      - name: DB
+        in: header
+        schema:
+          type: string
+          example: '{{database}}'
+        description: Sets the selected Database for queries
+      - name: table
+        in: path
+        required: true
+        schema:
+          type: string
+          example: person
+        description: The table of the record to create
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: test
+        description: The id of the record to create
+      requestBody:
+        content:
+          text/plain:
+            examples:
+              /key/:table/:id:
+                value: |-
+                  {
+                      account: account:test,
+                      tester: true,
+                  }
+      responses:
+        '200':
+          description: 'Record created successfully'
+
+    put:
+      tags:
+        - record
+      summary: 'Update a specific record in a table'
+      description: |-
+        This HTTP RESTful endpoint updates a specific record in a table in the database. The supplied request body is used as the content of the record, and is equivalent to running:
+
+        ``` sql
+        UPDATE type::thing($table, $id) CONTENT $body;
+        ```
+      parameters:
+      - name: tags
+        in: query
+        schema:
+          type: string
+          example: '[''rust'', ''developer'']'
+      - name: NS
+        in: header
+        schema:
+          type: string
+          example: '{{namespace}}'
+        description: Sets the selected Namespace for queries
+      - name: DB
+        in: header
+        schema:
+          type: string
+          example: '{{database}}'
+        description: Sets the selected Database for queries
+      - name: table
+        in: path
+        required: true
+        schema:
+          type: string
+          example: person
+        description: The table of the record to update
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: test
+        description: The id of the record to update
+      requestBody:
+        content:
+          text/plain:
+            examples:
+              /key/:table/:id:
+                value: |-
+                  {
+                      account: account:test,
+                      tester: true,
+                  }
+      responses:
+        '200':
+          description: 'Record updated successfully'
+
+    patch:
+      tags:
+        - record
+      summary: 'Update a specific record in a table'
+      description: |-
+        This HTTP RESTful endpoint updates a specific record in a table in the database. It merges the supplied request data with the records in the table, and is equivalent to running:
+
+        ``` sql
+        UPDATE type::thing($table, $id) MERGE $body;
+        ```
+      parameters:
+      - name: NS
+        in: header
+        schema:
+          type: string
+          example: '{{namespace}}'
+        description: Sets the selected Namespace for queries
+      - name: DB
+        in: header
+        schema:
+          type: string
+          example: '{{database}}'
+        description: Sets the selected Database for queries
+      - name: table
+        in: path
+        required: true
+        schema:
+          type: string
+          example: person
+        description: The table of the record to update
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: test
+        description: The id of the record to update
+      requestBody:
+        content:
+          text/plain:
+            examples:
+              /key/:table/:id:
+                value: |-
+                  {
+                      account: account:test,
+                      tester: true,
+                  }
+      responses:
+        '200':
+          description: 'Record updated successfully'
+
+    delete:
+      tags:
+        - record
+      summary: 'Delete a specific record from a table'
+      description: |-
+        This HTTP RESTful endpoint deletes a specific record from a table in the database. It is equivalent to running:
+
+        ``` sql
+        DELETE type::thing($table, $id);
+        ```
+      parameters:
+      - name: NS
+        in: header
+        schema:
+          type: string
+          example: '{{namespace}}'
+        description: Sets the selected Namespace for queries
+      - name: DB
+        in: header
+        schema:
+          type: string
+          example: '{{database}}'
+        description: Sets the selected Database for queries
+      - name: table
+        in: path
+        required: true
+        schema:
+          type: string
+          example: person
+        description: The table of the record to delete
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: test
+        description: The id of the record to delete
+      responses:
+        '200':
+          description: 'Record deleted successfully'
+
+  /sql:
+
+    post:
+      tags:
+        - sql
+      summary: Run SurrealQL queries against SurrealDB
+      description: The SQL endpoint enables running advanced SurrealQL queries. This HTTP endpoint expects the HTTP body to be one or more SurrealQL statements, separated by a semicolon.
+      parameters:
+      - name: NS
+        in: header
+        schema:
+          type: string
+          example: '{{namespace}}'
+        description: Sets the selected Namespace for queries
+      - name: DB
+        in: header
+        schema:
+          type: string
+          example: '{{database}}'
+        description: Sets the selected Database for queries
+      requestBody:
+        content:
+          text/plain:
+            examples:
+              /sql:
+                value: |-
+                  BEGIN TRANSACTION;
+                  UPDATE person:one SET name = 'Joe Bloggs';
+                  UPDATE person:two SET name = 'Elizabeth Hurdle';
+                  LET $people = SELECT * FROM person;
+                  RETURN $people;
+                  COMMIT TRANSACTION;
+      responses:
+        '200':
+          description: 'Request completed successfully'
