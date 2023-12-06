@@ -225,6 +225,27 @@ paths:
           type: string
           example: person
         description: The table of the records to select
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          example: 100
+        description: The number of record results to fetch
+      - name: start
+        in: query
+        required: false
+        schema:
+          type: integer
+          example: 0
+        description: The number of record results to skip
+      - name: fields
+        in: query
+        required: false
+        schema:
+          type: string
+          example: account,age,name.first,name.last
+        description: A comma-separated list of specific fields to retrieve for each record
       responses:
         '200':
           description: 'Records selected successfully'
